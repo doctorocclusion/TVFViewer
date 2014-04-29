@@ -6,15 +6,11 @@ import net.turrem.utils.models.TVFFile;
 
 public class RenderEngine
 {
-	private int index = 0;
+	private static int index = 0;
 
-	public RenderEngine()
+	public static RenderObject makeObject(TVFFile tvf, float scale, float x, float y, float z)
 	{
-	}
-
-	public RenderObject makeObject(TVFFile tvf, float scale, float x, float y, float z)
-	{
-		RenderObject obj = new RenderObject(this.index++);
+		RenderObject obj = new RenderObject(index++);
 		TVFBuffer buff = new TVFBuffer();
 		buff.bindTVF(tvf, obj, scale, x, y, z);
 		return obj;
