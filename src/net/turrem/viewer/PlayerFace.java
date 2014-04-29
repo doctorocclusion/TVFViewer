@@ -13,7 +13,7 @@ public class PlayerFace
 	
 	protected float camPitch = 30.0F;
 	protected float camYaw = 45.0F;
-	protected float camDist = 16.0F;
+	protected float camDist = 20.0F;
 
 	protected Point camFocus;
 	protected Point camLoc;
@@ -161,7 +161,7 @@ public class PlayerFace
 			dX += dy * siny * sinp;
 			dZ += dy * cosy * sinp;
 			dZ += dx * siny;
-			dY += dy * cosp;
+			dY -= dy * cosp;
 			this.camFocus.moveDelta(dX, dY, dZ);
 		}
 		this.doFocus();

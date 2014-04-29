@@ -221,7 +221,7 @@ public class TVFFile
 		}
 
 		tvf.fileVersion = stream.readShort();
-
+		
 		if (tvf.fileVersion != theFileVersion)
 		{
 			return null;
@@ -296,5 +296,12 @@ public class TVFFile
 		}
 
 		return tvf;
+	}
+	
+	public static TVFFile convertVox(VOXFile vox)
+	{
+		TVFFile tvf = new TVFFile();
+		VoxToTvf con = new VoxToTvf(tvf, vox);
+		return con.make();
 	}
 }

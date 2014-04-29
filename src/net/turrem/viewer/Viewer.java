@@ -1,14 +1,21 @@
 package net.turrem.viewer;
 
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
 
 import net.turrem.utils.graphics.ImgUtils;
+import net.turrem.utils.models.TVFFile;
+import net.turrem.utils.models.VOXFile;
+import net.turrem.viewer.render.engine.RenderEngine;
+import net.turrem.viewer.render.object.RenderObject;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -19,19 +26,16 @@ import org.lwjgl.input.Keyboard;
 public class Viewer
 {
 	public String modelFile;
-	
 	public String theDir;
-	
 	public RenderViewer render;
+	public RenderObject tvfRender;
+	
+	public long tickCount = 0;
 
 	public Viewer(String filename, String rundir)
 	{
 		this.theDir = rundir;
-		if (filename != null)
-		{
-			File file = new File(filename);
-			this.loadFile(file);
-		}
+		this.modelFile = filename;
 	}
 	
 	public void run()
@@ -88,12 +92,24 @@ public class Viewer
 
 	private void tick()
 	{
+		this.tickCount++;
+		if (this.tickCount == 4)
+		{
+			if (this.modelFile != null)
+			{
+				File file = new File(this.modelFile);
+				this.loadFile(file);
+			}
+		}
 		this.render.render();
 	}
 
 	public void render()
 	{
-		
+		if (this.tvfRender != null)
+		{
+			this.tvfRender.doRender();
+		}
 	}
 	
 	public void setDisplayMode(int width, int height)
@@ -205,11 +221,32 @@ public class Viewer
 	
 	protected boolean doLoadTVF(File file) throws IOException
 	{
-		return false;
+		DataInputStream input = new DataInputStream(new GZIPInputStream(new FileInputStream(file)));
+		TVFFile tvf = TVFFile.read(input);
+		input.close();
+		if (tvf == null)
+		{
+			return false;
+		}
+		this.tvfRender = RenderEngine.makeObject(tvf, 1.0F, (tvf.width & 0xFF) / 2, (tvf.height & 0xFF) / 2, (tvf.length & 0xFF) / 2);
+		return this.tvfRender != null;
 	}
 
 	protected boolean doLoadVox(File file) throws IOException
 	{
-		return false;
+		DataInputStream input = new DataInputStream(new FileInputStream(file));
+		VOXFile vox = VOXFile.read(input);
+		input.close();
+		if (vox == null)
+		{
+			return false;
+		}
+		TVFFile tvf = TVFFile.convertVox(vox);
+		if (tvf == null)
+		{
+			return false;
+		}
+		this.tvfRender = RenderEngine.makeObject(tvf, 1.0F, (tvf.width & 0xFF) / 2, (tvf.height & 0xFF) / 2, (tvf.length & 0xFF) / 2);
+		return this.tvfRender != null;
 	}
 }

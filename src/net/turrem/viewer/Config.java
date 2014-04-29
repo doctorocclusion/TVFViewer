@@ -4,12 +4,12 @@ public class Config
 {
 	public static int getHeight()
 	{
-		return 800;
+		return 600;
 	}
 
 	public static int getWidth()
 	{
-		return 800;
+		return 600;
 	}
 
 	public static float getMouseSpeed()
